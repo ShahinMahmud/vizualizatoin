@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+    <title>from source to all building and then destination to all building</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.12/cytoscape.js"></script>
+
+    <style>
+        body { 
+            font: 14px helvetica neue, helvetica, arial, sans-serif;
+        }
+
+        #cy {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cy"></div>
+
+
+    <script>
+        var cy = cytoscape({
+            container: document.getElementById('cy'),
+
+            boxSelectionEnabled: false,
+            autounselectify: true,
+
+            style: cytoscape.stylesheet()
+                .selector('node')
+                .css({
+                    'content': 'data(id)'
+                })
+                .selector('.h')
+                .css({
+                    'background-color': 'green',
+                })
+                .selector('.h1')
+                .css({
+                    'background-color': 'orange',
+                })
+                .selector('edge')
+                .css({
+                    'curve-style': 'bezier',
+                    //'target-arrow-shape': 'triangle',
+                    'width': 4,
+                    'line-color': '#ddd',
+                    'target-arrow-color': '#ddd'
+                })
+                .selector('.highlighted')
+                .css({
+                    //'background-color': 'green',
+                    'line-color': 'green',
+                    //'target-arrow-color': '#61bffc',
+                    'transition-property': 'background-color, line-color, target-arrow-color',
+                    'transition-duration': '0.5s'
+                })
+                .selector('.highlighted1')
+                .css({
+                    //'background-color': 'orange',
+                    'line-color': 'orange',
+                    //'target-arrow-color': '#61bffc',
+                    'transition-property': 'background-color, line-color, target-arrow-color',
+                    'transition-duration': '0.5s'
+                }),
+
+            elements: {
+                nodes: [
+                    { data: { id: 'a' } },
+                    { data: { id: 'b' } },
+                    { data: { id: 'c' } },
+                    { data: { id: 'd' } },
+                    { data: { id: 'e' } },
+                  
+                ],
+
+                edges: [
+                    { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
+                    { data: { id: 'ea', weight: 1, source: 'e', target: 'a' } },
+
+
+                    { data: { id: 'ab', weight: 1, source: 'a', target: 'b' } },
+                    { data: { id: 'ba', weight: 1, source: 'b', target: 'a' } },
+                  
+                   
+
+
+                    { data: { id: 'be', weight: 1, source: 'b', target: 'e' } },
+                    { data: { id: 'eb', weight: 1, source: 'e', target: 'b' } },
+
+                    { data: { id: 'bc', weight: 1, source: 'b', target: 'c' } },
+                    { data: { id: 'cb', weight: 1, source: 'c', target: 'b' } },
+
+                    { data: { id: 'ce', weight: 1, source: 'c', target: 'e' } },
+                    { data: { id: 'ec', weight: 1, source: 'e', target: 'c' } },
+
+                    { data: { id: 'cd', weight: 1, source: 'c', target: 'd' } },
+                    { data: { id: 'dc', weight: 1, source: 'd', target: 'c' } },
+
+                    { data: { id: 'de', weight: 1, source: 'd', target: 'e' } },
+                    { data: { id: 'ed', weight: 1, source: 'e', target: 'd' } },
+                  
+                    
+                ]
+            },
+
+            layout: {
+                name: 'breadthfirst',
+                directed: false,
+                roots: '#c',
+                padding: 10
+            }
+        });
+        
+        
+        // source and destination
+        cy.nodes('#d').addClass('h1');
+        cy.nodes('#a').addClass('h');
+
+        //cy.nodes("#a").style.="a(source_building)"
+
+        console.log(cy.nodes("#a"))
+       
+
+        var bfs = cy.elements().bfs('#a', function(){
+            //alert(Object.keys(cy.edges("e")));
+        }, true);
+
+
+        var bfs1 = cy.elements().bfs('#d', function(){
+            //alert(Object.keys(cy.edges("e")));
+        }, true);
+
+       
+        // coloring the path to every building from source
+        var i = 0;
+        var highlightNextEle = function(){
+            
+            if( i < bfs.path.length ){
+                bfs.path[i].addClass('highlighted');
+                i++;
+                setTimeout(highlightNextEle,1000);
+            }
+        };
+
+
+
+        // coloring the path to every building from destination
+        var j = 0
+        var highlightNextEle1 = function(){
+            if( j < bfs1.path.length ){
+                bfs1.path[j].addClass('highlighted1');
+               
+                j++;
+                setTimeout(highlightNextEle1, 1000);
+            }
+        }
+
+        setTimeout(() => {
+            highlightNextEle();
+            highlightNextEle1();
+        }, 3000);
+
+</script>
+</body>
+</html>
